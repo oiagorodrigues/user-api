@@ -1,17 +1,33 @@
-package dev.iagorodrigues.userapi.dto;
+package dev.iagorodrigues.userapi.model;
 
-import dev.iagorodrigues.userapi.model.User;
+import dev.iagorodrigues.userapi.dto.UserDTO;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.time.Instant;
 
-public class UserDTO {
+@Entity
+public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
     private String name;
     private String socialSecurityNumber;
     private String address;
     private String email;
     private String phone;
     private Instant registerDate;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -61,16 +77,14 @@ public class UserDTO {
         this.registerDate = registerDate;
     }
 
-    public static UserDTO convert(User user) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setName(user.getName());
-        userDTO.setRegisterDate(user.getRegisterDate());
-        userDTO.setPhone(user.getPhone());
-        userDTO.setAddress(user.getAddress());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setSocialSecurityNumber(userDTO.getSocialSecurityNumber());
-        return userDTO;
+    public static User convert(UserDTO userDTO) {
+        User user = new User();
+        user.setName(userDTO.getName());
+        user.setAddress(userDTO.getAddress());
+        user.setSocialSecurityNumber(userDTO.getSocialSecurityNumber());
+        user.setEmail(userDTO.getEmail());
+        user.setPhone(userDTO.getPhone());
+        user.setRegisterDate(userDTO.getRegisterDate());
+        return user;
     }
-
-
 }

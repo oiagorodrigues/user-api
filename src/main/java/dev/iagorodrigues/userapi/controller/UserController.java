@@ -6,82 +6,50 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import javax.annotation.PostConstruct;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import dev.iagorodrigues.userapi.dto.UserDTO;
+import dev.iagorodrigues.userapi.service.UserService;
+
+import java.util.Date;
+import java.util.List;
 
 @RestController
 public class UserController {
 
-    public static List<UserDTO> users = new ArrayList<>();
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/users")
-    public UserDTO createUser(@RequestBody UserDTO user) {
-        user.setRegisterDate(new Date().toInstant());
-        users.add(user);
-        return user;
+    public UserDTO createUser(@RequestBody UserDTO userDTO) {
+        userDTO.setRegisterDate(new Date().toInstant());
+        return userService.save(userDTO);
     }
 
     @GetMapping("/users")
     public List<UserDTO> getUsers() {
-        return users;
+        return userService.getAll();
+    }
+
+    @GetMapping("/users/{id}")
+    public UserDTO getUser(@PathVariable Long id) {
+        return userService.findById(id);
     }
 
     @GetMapping("/users/{socialSecurityNumber}")
     public UserDTO getUser(@PathVariable String socialSecurityNumber) {
-        for (UserDTO user : users) {
-            if (user.getSocialSecurityNumber().equals(socialSecurityNumber)) {
-                return user;
-            }
-        }
-        return null;
+        return userService.findBySocialSecurityName(socialSecurityNumber);
     }
 
-    @DeleteMapping("/users/{socialSecurityNumber}")
-    public boolean deleteUser(@PathVariable String socialSecurityNumber) {
-        for (UserDTO user : users) {
-            if (user.getSocialSecurityNumber().equals(socialSecurityNumber)) {
-                users.remove(user);
-                return true;
-            }
-        }
-        return false;
+    @GetMapping("/users/search")
+    public List<UserDTO> searchUser(@RequestParam String name) {
+        return userService.queryByName(name);
     }
 
-    @PostConstruct
-    public void initiateList() {
-        UserDTO	userDTO	= new UserDTO();
-        userDTO.setName("Eduardo");
-        userDTO.setSocialSecurityNumber("123");
-        userDTO.setAddress("Rua A");
-        userDTO.setEmail("eduardo@email.com");
-        userDTO.setPhone("1234-5678");
-        userDTO.setRegisterDate(new Date().toInstant());
-
-        UserDTO	userDTO2 = new UserDTO();
-        userDTO2.setName("Luiz");
-        userDTO2.setSocialSecurityNumber("456");
-        userDTO2.setAddress("Rua B");
-        userDTO2.setEmail("luiz@email.com");
-        userDTO2.setPhone("1234-3454");
-        userDTO2.setRegisterDate(new Date().toInstant());
-
-        UserDTO	userDTO3 = new UserDTO();
-        userDTO3.setName("Bruna");
-        userDTO3.setSocialSecurityNumber("789");
-        userDTO3.setAddress("Rua C");
-        userDTO3.setEmail("bruna@email.com");
-        userDTO3.setPhone("5435-3214");
-        userDTO3.setRegisterDate(new Date().toInstant());
-
-        users.add(userDTO);
-        users.add(userDTO2);
-        users.add(userDTO3);
+    @DeleteMapping("/users/{id}")
+    public UserDTO deleteUser(@PathVariable Long id) {
+        return userService.delete(id);
     }
 
 }
